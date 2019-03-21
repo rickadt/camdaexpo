@@ -17,6 +17,7 @@ Feito com Python com as tecnologias:
 ```pip3 install -r requeriments.txt```
 
 Para rodar o servidor de desemvolvimento / testes
+
 ```export FLASK_APP=run.py```
 
 ```export FLASK_ENV=development```
