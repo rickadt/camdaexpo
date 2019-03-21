@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Admin
+Flask-Security
+#Flask-Command
+#Flask-Script

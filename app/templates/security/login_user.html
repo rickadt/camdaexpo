@@ -1,0 +1,36 @@
+{% extends "security/base.html" %}
+{% from "security/_macros.html" import render_field_with_errors, render_field %}
+
+{% block content %}
+{% include "security/_messages.html" %}
+
+<div class="container">
+  <br /><br />
+  <div class="row">
+  <div class="col-md align-self-left">
+  </div>
+  <div class="col-md align-self-center">
+    <img class="mb-4" src="{{ url_for('static', filename='img/logo_login.png') }}" alt="" width="290" height="116">
+    <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+    <h1 class="h3 mb-3 font-weight-normal">{{ _('Login') }}</h1>
+      {{ login_user_form.hidden_tag() }}
+      <label for="inputEmail" class="sr-only">Email address</label>
+      <input type="email" id="email" name="email" class="form-control" placeholder="Email" required autofocus>
+      <br />
+      <label for="inputPassword" class="sr-only">Password</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Senha" required>
+      <br />
+      <div class="checkbox mb-3">
+        <label>
+          <input id="remember" name="remember" type="checkbox" value="remember-me"> Remember me
+        </label>
+      </div>
+      <button id="submit" name="submit" class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    <!-- <p class="mt-5 mb-3 text-muted">&copy; 2017-2019</p> -->
+  </form>
+</div>
+<div class="col-md align-self-rigth">
+</div>
+</div>
+{% include "security/_menu.html" %}
+{% endblock %}
