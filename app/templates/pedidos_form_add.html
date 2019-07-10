@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{#% block title %} {{ title or "Evento CAMDA" }} {% endblock %#}
+
+{% block navbar %} {% include "navbar.html" %} {% endblock %}
+
+{% block body_content %}
+
+<script src="{{ url_for('static', filename='js/jquery.validate-1.19.1.js') }}"></script>
+<script type="text/javascript">
+$(function() {
+   $("#nomeCooperado").autocomplete({
+       source:function(request, response) {
+           $.getJSON("{{url_for('pedidos.autocompletenome')}}",{
+               q: request.term, // in flask, "q" will be the argument to look for using request.args
+           }, function(data) {
+               response(data.matching_results); // matching_results from jsonify
+           });
+       },
+       minLength: 4,
+       // select: function(event, ui) {
+       //     console.log(ui.item.value); // not in your question, but might help later
+       // }
+   });
+})
+
+$(function() {
+   $("#nomeVendedor").autocomplete({
+       source:function(request, response) {
+           $.getJSON("{{url_for('pedidos.autocompletevendedor')}}",{
+               q: request.term, // in flask, "q" will be the argument to look for using request.args
+           }, function(data) {
+               response(data.matching_results); // matching_results from jsonify
+           });
+       },
+       minLength: 4,
+       // select: function(event, ui) {
+       //     console.log(ui.item.value); // not in your question, but might help later
+       // }
+   });
+})
+
+
+$( document ).ready( function () {
+$("#form_pedido").validate({
+    rules:{
+        nomeCooperado:{
+            required:true,
+            minlength:8
+        },
+        nomeVendedor:{
+            required:true,
+            minlength:8
+        },
+        valor:{
+            required:true,
+            number:true
+        }
+    },
+    messages:{
+        nomeCooperado:{
+            required:"Digite o nome do cooperado",
+            minlength:"O nome do cooperado está muito curto"
+        },
+        nomeVendedor:{
+            required:"Digite o nome do vendedor",
+            minlength:"O nome do vendedor está muito curto"
+        },
+        valor:{
+            required:"Digite o valor",
+            number:"Digite um valor como 1000,00"
+        }
+    }
+
+});
+});
+</script>
+  <div class="ui-widget">
+  <form class="include" method="post" id="form_pedido" action="{{ url_for('pedidos.new_save') }}">
+
+    <div class="form-group">
+        <label for="nomeCooperado">Cooperado</label>
+        <input type="text" class="form-control" id="nomeCooperado" name="nomeCooperado" placeholder="Nome do coopedado" style="text-transform:uppercase" autofocus>
+    </div>
+    <div class="form-group">
+        <label for="nomeVendedor">Vendedor</label>
+        <input type="text" class="form-control" id="nomeVendedor" name="nomeVendedor" placeholder="Nome do vendedor" style="text-transform:uppercase">
+    </div>
+    <div class="form-group">
+      <label for="filial">Filial</label>
+      <select class="form-control" id="filial" name="filial">
+        {% for filial in filiais %} <option value="{{filial.id}}">{{filial.numero}} - {{filial.nome}}</option> {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="segmento">Segmento</label>
+      <select class="form-control" id="segmento" name="segmento">
+        {% for segmento in segmentos %} <option value="{{segmento.id}}">{{segmento.nome}}</option> {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+        <label for="valor">Valor</label>
+        <input type="number" class="form-control" id="valor" name="valor" placeholder="R$ 0,00">
+    </div>
+     <br />
+     <br />
+     <input class="btn btn-lg btn-primary" id="salvar" type="submit" value="Salvar" />
+   </form>
+ </div>
+
+{% endblock %}

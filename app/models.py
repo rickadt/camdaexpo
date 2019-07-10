@@ -7,24 +7,25 @@ class Filial(db.Model):
     __tablename__ = 'filiais'
 
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100))
+    nome = db.Column(db.String(100), nullable=False)
+    numero = db.Column(db.Integer, nullable=False)
 
     def __str__(self):
         return self.nome
 
     def __repr__(self):
-        return "<Tipo(id='{}', nome='{}')>".format(self.id, self.nome)
+        return "<Filial(id='{}', nome='{}')>".format(self.id, self.nome)
 
 
 class Vendedor(db.Model):
     __tablename__ = 'vendedores'
 
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(255))
+    nome = db.Column(db.String(255), nullable=False)
     codigo = db.Column(db.String(20))
 
     filial_id = db.Column(
-        db.Integer, db.ForeignKey('filiais.id'), nullable=False)
+        db.Integer, db.ForeignKey(Filial.id), nullable=False)
     filial = db.relationship(
         Filial, backref=db.backref('VendedorFilial', lazy=True))
 
@@ -39,7 +40,7 @@ class Coop(db.Model):
     __tablename__ = 'coops'
 
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(255))
+    nome = db.Column(db.String(255), nullable=False)
     cidade = db.Column(db.String(255))
     matricula = db.Column(db.String(255))
     cpf = db.Column(db.String(255))
@@ -53,21 +54,53 @@ class Coop(db.Model):
         return self.nome
 
     def __repr__(self):
-        return "<Tipo(id='{}', nome='{}')>".format(self.id, self.nome)
+        return "<Coop(id='{}', nome='{}', cidade='{}', matricula='{}', "\
+               "cpf='{}')>".format(self.id, self.nome, self.cidade,
+                                   self.matricula, self.cpf)
+
+
+class Segmento(db.Model):
+    __tablename__ = 'segmentos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(255), nullable=False)
+
+    # gera cupons a cada X reais do pedido, ex: se valor_cupon for 1000, um
+    # pedido de 10.000 reais irá gerar 10 cupons
+    # se for 0 não irá gerar cupons
+    # se for 1 irá gerar apenas um cupon por dedido independente do valor
+    valor_cupon = db.Column(db.Integer, nullable=False)
+
+    def __str__(self):
+        return self.nome
+
+    def __repr__(self):
+        return "<Segmento(id='{}', nome='{}', valor_cupon)>".format(
+            self.id, self.nome, self.valor_cupon)
 
 
 class Pedido(db.Model):
     __tablename__ = 'pedidos'
 
     id = db.Column(db.Integer, primary_key=True)
-    valor = db.Column(db.DECIMAL(10, 2))
+    valor = db.Column(db.DECIMAL(10, 2), nullable=False)
 
     # sorteado = db.Column(db.Integer())  # excluir
     datahora = db.Column(db.DateTime, default=datetime.utcnow)
 
     # se 0 foi cadastrado na feira, se 1 foi cadastrado nas lojas
     importado = db.Column(db.Integer())
-    segmento = db.Column(db.String(20))  # Nutrição, Loja, Insumos, etc.
+
+    # Usuário que cadastrou o pedido
+    # usuários de loja só pode ver e editar seus proprios pedidos
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('User', lazy=True))
+
+    # Nutrição, Loja, Insumos, etc.
+    segmento_id = db.Column(
+        db.Integer, db.ForeignKey(Segmento.id), nullable=False)
+    segmento = db.relationship(
+        Segmento, backref=db.backref('Segmento', lazy=True))
 
     vendedor_id = db.Column(
         db.Integer, db.ForeignKey('vendedores.id'), nullable=False)
@@ -81,14 +114,20 @@ class Pedido(db.Model):
         db.Integer, db.ForeignKey('filiais.id'), nullable=False)
     filial = db.relationship(Filial, backref=db.backref('Filial', lazy=True))
 
+    def __str__(self):
+        return str(self.id)
+
     def __repr__(self):
-        return "<Pedido(id='{}', valor='{}', sorteado='{}', importado='{}', \
-vendedor_id='{}', coop_id'{}, filial_id='{}')>".format(
-            self.id, self.valor, self.sorteado, self.importado,
-            self.vendedor_id, self.coop_id, self.filial_id)
+        return "<Pedido(id='{}', valor='{}', datahora='{}', importado='{}', "\
+               "user_id='{}' vendedor_id='{}', coop_id'{},"\
+               " filial_id='{}')>".format(
+                   self.id, self.valor, self.datahora, self.importado,
+                   self.user_id, self.vendedor_id, self.coop_id,
+                   self.filial_id)
 
 
 # Cupons gerados conforme os pedidos
+# um pedido pode ter um ou mais cupons
 class Cupon(db.Model):
     __tablename__ = 'cupons'
 
@@ -100,6 +139,10 @@ class Cupon(db.Model):
     pedido_id = db.Column(
         db.Integer, db.ForeignKey('pedidos.id'), nullable=False)
     pedido = db.relationship(Pedido, backref=db.backref('Pedido', lazy=True))
+
+    def __repr__(self):
+        return "<Cupon(id='{}', ativo='{}', sorteado='{}')>".format(
+            self.id, self.ativo, self.sorteado)
 
 
 # Tabela com os sorteios de prêmios
@@ -117,7 +160,7 @@ class Sorteio(db.Model):
     # ganhou algum premio não participa mais
     # -  'TODOS' = todos os checkins participam
     # -  'NAO_SORTEADOS' = somente aqueles que ainda não foram sorteados
-    quem_participa = db.Column(db.String(255))
+    quem_participa = db.Column(db.String(255), default='nao_sorteados')
 
     # relacionamento com os cupons
     cupon_id = db.Column(db.Integer, db.ForeignKey('cupons.id'), nullable=True)

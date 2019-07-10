@@ -5,19 +5,25 @@ from flask import Flask
 from flask_migrate import Migrate, MigrateCommand
 # from flask_bootstrap import Bootstrap
 from flask_security import SQLAlchemyUserDatastore, Security, login_required
+from flask_security.utils import encrypt_password
 from .db import db
 from .models import User, Role
-# from .admin import configure_admin
+from .admin import configure_admin
+from .populate import (add_admin, add_users, add_filiais, add_vendedores,
+                       add_cooperados)
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.sqlite'
+app.config['SQLALCHEMY_DATABASE_URI'] = \
+    'postgresql://postgres:camdacpd@localhost:5432/camdaexpo1'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SQLALCHEMY_ECHO'] = True
 app.config['SECRET_KEY'] = 'é muito secreto esse bilete ;-)'
 app.config['DEBUG'] = True
 app.config['SECURITY_PASSWORD_HASH'] = 'sha512_crypt'
 app.config['SECURITY_PASSWORD_SALT'] = app.config['SECRET_KEY']
+app.config['SECURITY_REGISTERABLE'] = False
+app.config['SECURITY_TRACKABLE'] = True
 
 
 db.init_app(app)
@@ -26,12 +32,12 @@ migrate = Migrate(app, db)
 # manager.add_command('db', MigrateCommand)
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, user_datastore)
-# configure_admin(app)
+configure_admin(app)
 
 
 # from .blueprints.login import login_bp
 # from .blueprints.home import home_bp
-# from .blueprints.pedidos import pedidos_bp
+from .blueprints.pedidos import pedidos_bp
 # from .blueprints.lottery import lottery_bp
 
 # login_manager = LoginManager()
@@ -39,7 +45,7 @@ security = Security(app, user_datastore)
 
 # app.register_blueprint(login_bp)
 # app.register_blueprint(home_bp)
-# app.register_blueprint(pedidos_bp)
+app.register_blueprint(pedidos_bp)
 # app.register_blueprint(lottery_bp)
 
 
@@ -47,36 +53,28 @@ security = Security(app, user_datastore)
 # usuários existem, se não existem, os cria
 @app.before_first_request
 def create_admin_user():
-
     # testa para ver se o usuário Admin existe
-    admin = User.query.get(1)
+    admin = User.query.first()
+    print('\n\n\n\t\tadmin:', admin)
     if admin is None:
         # Cria o usuário admin quando o sistema é executado pela primeira vez
-        user_datastore.create_role(name='admin', description='Administrador')
-        user_datastore.create_user(
-            name='Admin',
-            email='admin@local',
-            password='Camda@3000',
-            roles=['admin'])
-        db.session.commit()
+        add_admin()
 
-        user_datastore.create_role(name='users', description='Usuários')
-        user_datastore.create_user(
-            name='User 1',
-            email='user1',
-            password='camda2019',
-            roles=['users'])
-        user_datastore.create_user(
-            name='Filial Adamantina',
-            email='filial01',
-            password='camda2019',
-            roles=['users'])
-        db.session.commit()
+        # adiciona as filiais
+        add_filiais()
 
+        # cria os usuários para usu nas filiais e no ModelView_Lancamento
+        add_users()
+
+        # adiciona os add_vendedores
+        add_vendedores()
+
+        # adiciona os cooperados
+        add_cooperados()
 
 @app.route('/')
 @login_required
-def teste():
+def home():
     return('hello world')
 
 

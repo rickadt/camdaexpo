@@ -12,8 +12,12 @@ Feito com Python com as tecnologias:
 
 # criando ambiente de desemvolvimento
 ### no linux
+
+Instalar o pip
+
 ```sudo apt-get install python3-dev python3-pip```
 
+Instalando as dependencias com o pip
 ```pip3 install -r requeriments.txt```
 
 Para rodar o servidor de desemvolvimento / testes

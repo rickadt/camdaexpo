@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="CamdaExpo Evento CAMDA">
+    <meta name="author" content="Carlos Henrique Marques da Cunha Filho">
+
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='img/favico32.jpeg') }}" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-1.12.1.css') }}">
+
+    <title>{% block title %} {{title or "Evento CAMDA"}} {% endblock %}</title>
+
+  </head>
+
+  <script src="{{ url_for('static', filename='js/jquery-3.4.1.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/popper.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/jquery-ui-1.12.1.js') }}"></script>
+
+
+  <body>
+    {% block navbar %}
+    {% endblock %}
+    <br />
+    <div class="container" id="principal" >
+      {% block body_content %}
+      {% endblock %}
+    </div>
+  </body>
+
+  <script>
+  // $(document).ready(function() {
+  //     console.log('read: Pagina carregada');
+  //     jQuery("#principal").show();
+  //     // jQuery("#menuprincipal").show();
+  // }).delay(200);
+  </script>
+
+</html>
