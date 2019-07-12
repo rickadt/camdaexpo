@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+
+{% block navbar %} {% include "navbar.html" %} {% endblock %}
+
+{% block body_content %}
+<table class="table h6 table-borderless border border-info">
+  <thead class="border border-primary">
+   <tr>
+       <th colspan="4" scope="col" class="h4">LISTA DE PEDIDOS</th>
+   </tr>
+   <tr>
+     <th scope="col">NUMERO</th>
+     <th scope="col">COOPERADO</th>
+     <th scope="col">FILIAL</th>
+     <th scope="col">VALOR</th>
+   </tr>
+   </thead>
+   {% for p in pedidos %}
+   <tr class="border border-primary">
+     <td>{{p.id}}</td>
+     <td>{{p.coop}}</td>
+     <td>{{p.filial}}</td>
+     <td>R$ {{p.valor|replace('.', ','|safe)}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<!-- Paginação -->
+<nav aria-label="Page navigation example">
+  <ul class="pagination">
+    {% if left %}
+      <li class="page-item"><a class="page-link" href="{{left}}"> < </a></li>
+    {% endif %}
+
+    {% for p in pages%}
+
+      {% if p == 1 %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('pedidos.list')}}"> {{p}} </a></li>
+      {% else %}
+        <li class="page-item"><a class="page-link" href="{{ url_for('pedidos.list')}}/{{p}}"> {{p}} </a></li>
+      {% endif %}
+
+    {% endfor %}
+
+    {% if right %}
+      <li class="page-item"><a class="page-link" href="{{ url_for('pedidos.list')}}/{{right}}"> > </a></li>
+    {% endif %}
+
+  </ul>
+</nav>
+
+{% endblock %}

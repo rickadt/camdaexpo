@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block navbar %} {% include "navbar.html" %} {% endblock %}
+
+{% block body_content %}
+
+<div class="row">
+  <div class="col">
+    <table class="table h3  table-borderless border border-info">
+      <thead class="border border-info">
+       <tr>
+         <th colspan="2" scope="col">TOTAL DE PEDIDOS</th>
+       </tr>
+       </thead>
+      <tr class="border border-info">
+        <td>QUANTIDADE: {{pedidos_quant}}</td>
+      </tr>
+      <tr class="border border-info">
+        <td>VALOR: R$ {{pedidos_valor}}</td>
+      </tr>
+    </table>
+  </div>
+  <div class="col-5"></div>
+</div>
+<br />
+
+<table class="table h6 table-borderless border border-info">
+  <thead class="border border-info">
+   <tr>
+     <th colspan="3" scope="col" class="h4">ÚLTIMOS PEDIDOS</th>
+   </tr>
+   <tr class="h5">
+     <th scope="col">COOPERADO</th>
+     <th scope="col">FILIAL</th>
+     <th scope="col">VALOR</th>
+   </tr>
+   </thead>
+{% for p in pedidos %}
+  <tr class="border border-info">
+    <td>{{p.coop}}</td>
+    <td>{{p.filial}}</td>
+    <!-- <td>R$ {{p.valor}}</td> -->
+    <td>R$ {{ p.valor|replace('.', ','|safe) }}</td>
+  </tr>
+{% endfor %}
+
+{% endblock %}

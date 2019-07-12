@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block body_content %}
+
+<form class="border border-success p-5">
+
+<div class="row alert alert-success ">
+    <div class="col"><h1>Pedido cadastrado com sucesso</h1></div>
+</div>
+<br />
+<div class="row">
+  <div class="col">
+    <h3>Nº do pedido {{idpedidos}}</h3>
+  </div>
+</div>
+
+    {% if cupons > 0 %}
+     <div class="row">
+        <div class="col">
+            <h3>Esse pedido gerou {{cupons}} cupons</h3>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+       <div class="col">
+           <h3>Esse pedido não gerou cupons</h3>
+       </div>
+   </div>
+   {% endif %}
+
+<br />
+<br />
+    <div class="col">
+        <button type="submit" autofocus class="btn btn-lg btn-primary" formaction="{{ url_for('pedidos.new') }}">OK</button>
+    </div>
+</form>
+
+{% endblock %}

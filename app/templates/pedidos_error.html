@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block body_content %}
+
+<form class="border border-danger p-5" style="text-transform:uppercase">
+
+<div class="row alert alert-danger">
+    <strong><div class="col h2">{{msg['error']}}</div></strong>
+</div>
+
+{% for data in msg['data'] %}
+<div class="row alert alert-warning text-dark m-0">
+    <strong><div class="col h2">{{data}}</div></strong>
+</div>
+{% endfor %}
+<br />
+{% if msg['btn_type'] == "button" %}
+  <input type="button" autofocus class="btn btn-lg btn-primary" value="{{msg['btn_label']}}" onClick="history.go(-1)">
+{% elif msg['btn_type'] == "submit" %}
+  <button type="submit" autofocus class="btn btn-lg btn-primary" formaction="{{ url_for(msg['btn_url']) }}">{{msg['btn_label']}}</button>
+{% endif %}
+
+</form>
+
+{% endblock %}
